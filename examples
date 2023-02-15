@@ -1,0 +1,105 @@
+//////////////////////////////// below are examples of best practices in JEST
+
+
+///////////////////////////////// Use single test file per component. i.e splitting the following components to seperate files.
+
+- accordion.test.js
+- button.test.js
+- icon.test.js
+
+// you should test the results - but not the logic
+
+it('Should return an array with ages above 18', () => { ... })
+
+//////////////////////////////////////////////// use BDD principles to organize your code
+describe('Mortgage Table', () => {
+  it('Should show additional data on click', () => { ... })
+  it('Should show warning message when there is no data', () => { ... })
+})
+
+/////////////////////////////////////////////////////////////// avoid duplicating logic
+describe('before / after hooks example', () => {
+  // Executes once before the two it blocks
+  beforeAll(() => { ... })
+
+  // Executes before the 1st it block, then executes a second time before the 2nd block
+  beforeEach(() => { ... })
+
+  it('first it block', () => { ... })
+  it('second it block', () => { ... })
+
+  // Executes once after the two it blocks
+  afterAll(() => { ... })
+
+  // Executes after the 1st it block, then executes a second time after the 2nd block
+  afterEach(() => { ... })
+  
+  
+  /////////////////////////////////////////////////// A unit test should have only one reason to fail
+  describe("One reason to fail - Good Practice", () => {
+  let stack;
+
+  beforeEach(() => {
+    stack = new Stack();
+  });
+
+  it("should throw an error when popping from an empty stack", () => {
+    expect(() => stack.pop()).toThrowError();
+  });
+
+  it("should return the top item when popping a non-empty stack", () => {
+    stack.push(789);
+
+    expect(stack.pop()).toEqual(789);
+  });
+});
+}
+
+///////////////////////////////////////////////////////////// testing both success and failure
+describe('When "calculate" button clicked', () => {
+  it('should NOT emit event when form not valid', () => {
+    const spy = jest.spyOn(component.calcChangeLoanEvent, 'emit');
+    component.form.controls.deferPayment.controls.isSelected.setValue(true);
+    component.form.controls.deferPayment.controls.deferDate.setValue(null);
+    component.calcChangeLoan();
+    component.calcClicked();
+    expect(spy).not.toHaveBeenCalled();
+   });
+  it('should emit event when form valid', () => {
+    const spy = jest.spyOn(component.calcChangeLoanEvent, 'emit');
+    component.form.controls.reduceAmount.controls.isSelected.setValue(true);
+    component.form.controls.reduceAmount.controls.refundAmount.setValue(33);
+    component.calcClicked();
+    expect(spy).toHaveBeenCalled();
+  });
+});
+
+//////////////////////////////////////////////////////////////////// Mock network example
+
+const bankMock = { bankCode: 114, bankGrade: 100 }; 
+
+describe('Initiate Bank Service', () => { 
+  let service: BankService; 
+  let httpTestingController: HttpTestingController; 
+  const expectedParams = ['lang']; 
+  beforeEach(() => { 
+    TestBed.configureTestingModule({ imports: [DemoTestModule.forRoot(), DemoHttpTestingModule], providers: [ BankService, ] }); 
+    service = TestBed.inject(BankService); 
+    httpTestingController = TestBed.inject(HttpTestingController); 
+  }
+); 
+
+describe('Bank Demo Data', () => { 
+  it('should be created', () => { 
+    expect(service).toBeTruthy(); 
+  });
+
+  it('should return a response', waitForAsync(() => { 
+    const matcher = (req: HttpRequest<any>) => { return req.url === `/BankServices/banks/retrieve-request` && req.method === 'GET' && expectedParams .every((param) => req.params.has(param) && req.params.get(param)); }; 
+    service.getBankData(AuthConsentCredentialsMock).subscribe(mock => { 
+      expect(mock).toBe(bankMock); }); 
+      const request = httpTestingController.expectOne(matcher); 
+     })); 
+});
+
+///////////////////////////////////////////////////////////////////////// testing edge cases
