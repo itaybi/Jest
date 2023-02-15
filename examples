@@ -103,3 +103,42 @@ describe('Bank Demo Data', () => {
 });
 
 ///////////////////////////////////////////////////////////////////////// testing edge cases
+
+// Example of a function that creates an array of specific length
+    // and filled with a given value.
+
+    function initArray(length, value) {
+      // Note that there is a mistake in this if condition -
+      // we throw an error if the length is zero.
+      if (!length) {
+       throw new Error(
+        "Invalid parameter length - must be a number greater or equal to 0"
+       );
+      }
+
+      return new Array(length).fill().map(() => value);
+    }
+    
+    describe("initArray - Including Edge Cases", () => {
+      it("should create an array of given size filled with the same value", () => {
+        expect(initArray(3, { id: 123 })).toEqual([
+          { id: 123 },
+          { id: 123 },
+          { id: 123 },
+        ]);
+      });
+
+      it("should handle an array length parameter of 0", () => {
+        expect(initArray(0, { id: 123 })).toEqual([]);
+      });
+
+      it("should throw an error if the array length parameter is -1", () => {
+        expect(() => initArray(-1, { id: 123 })).toThrowError();
+      });
+
+      it("should throw an error if the array length parameter is invalid", () => {
+        expect(() => initArray(undefined, { id: 123 })).toThrowError();
+      });
+    });
+    
+    
